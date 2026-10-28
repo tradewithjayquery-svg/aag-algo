@@ -1,0 +1,49 @@
+name: AAG Live Algo (Paper)
+
+on:
+  schedule:
+    # Mon-Fri 08:55 IST (03:25 UTC). GitHub kabhi late chalata hai, isliye
+    # entry se pehle buffer rakha hai. Script khud 09:20 tak wait karti hai.
+    - cron: "25 3 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      test:
+        description: "Test run (abhi turant, 3 min ka)? 1 likho, normal ke liye 0"
+        default: "0"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aag-algo
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install packages
+        run: pip install -r requirements.txt
+
+      - name: Run algo
+        env:
+          UPSTOX_ACCESS_TOKEN: ${{ secrets.UPSTOX_ACCESS_TOKEN }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TEST_MODE: ${{ github.event.inputs.test || '0' }}
+        run: python algo.py
+
+      - name: Save trade history
+        if: always()
+        run: |
+          git config user.name "aag-bot"
+          git config user.email "aag-bot@users.noreply.github.com"
+          git add trade_history.csv 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "trade history" && git push)
