@@ -1,0 +1,3 @@
+date,Stock,Type,Strike,Lot Size,Lots,Qty,Entry Time,Exit Time,Spot Entry,Spot Exit,Entry (₹),Exit (₹),PnL (₹),Reason
+2026-10-29,HYUNDAI,CALL,1960 CE,275,1,275,09:20,09:22,1962.9,1944.5,60.4,50.5,-2722.5,🛑 SL HIT
+2026-10-29,CUMMINSIND,PUT,4550 PE,100,1,100,09:20,10:09,4544.1,4518.8,119.2,160.0,4080.0,🎯 TARGET HIT
